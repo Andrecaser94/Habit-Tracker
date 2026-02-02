@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
 </head>
 <body>
     <!--TITLE AND SUBTITLE-->
@@ -73,85 +74,9 @@
         </div>
     </div>
     <button id="resetButton">Reset Button</button>
+    <button id="backButton">Back</button>
+    <button id="nextButton">Next</button>
 </body>
-<style>
-    body {
-        background-image: url("../calendar/32FD377D-7742-435D-A464-FA27D5BE1B7B.png");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 100vh;
-        background-color: rgb(255, 227, 227);
-        background-blend-mode: lighten;
-        text-align: center;
-        font-family: 'Sour Gummy', sans-serif;
-    }
-
-    #title {
-        margin-top: 100px;
-        line-height: 10px;
-    }
-
-    #subtitle {
-       opacity: 0.7;
-       font-size: 18px;
-       margin-bottom: 20px;
-    }
-
-    #calendarContainer {
-      display: flex;
-    }
-
-    #calendarDiv {
-        background-color: rgb(255, 255, 255);
-        border-radius: 10px 10px 20px 20px;
-        margin: auto;
-        align-content: center;
-        text-align: center;
-        width: 85%;
-        max-width: fit-content;
-
-    }
-
-    #calendarHeading {
-        display: flex;
-        justify-content: space-between;
-        border-radius: 10px 10px 0px 0px;
-        border: 2px solid black;
-        padding: 0px 20px;
-        background-color: pink;
-        line-height: 0px;
-    }
-    
-    #calendarContent {
-        padding: 20px;
-        border: 2px solid black;
-    }
-    
-    .days{
-        display: flex;
-    }
-
-    .day {
-        width: 30px;
-        margin: 3px;
-        padding: 10px;
-        font-size: 15px;
-        text-align: center;
-        border-radius: 20px;
-       /* background-color: pink;*/
-       /*border: 2px solid black;*/
-    }
-
-    #resetButton {
-        background-color: pink;
-        border: 2px solid black;
-        border-radius: 20px;
-        text-align: center;
-        padding: 10px;
-        margin-top: 20px;
-    }
-</style>
 
 <script>
     /*GET THE DATE*/
@@ -176,6 +101,7 @@ var months = [
     "March",
     "April",
     "May",
+    "June",
     "July",
     "August",
     "September",
@@ -183,6 +109,7 @@ var months = [
     "November",
     "December",
 ];
+
 
 /*SET THE CORRECT MONTH*/
 var title = document.getElementById("title");
@@ -265,7 +192,7 @@ console.log("total days completed: " + daysCompleted);
 
 /*CHECK STORAGE AND UPDATE COMPLETED ARRAY*/
 
-for(var i = 0; i < currentDate; i++) {
+for(var i = 0; i < dayCount; i++) {
     var tempString =
     "" + (currentMonth + 1) + "-" + (i + 1) + "-" + currentYear;
     console.log(tempString);
@@ -279,14 +206,19 @@ for(var i = 0; i < currentDate; i++) {
     } else if (chosenDay === "false") {
         chosenDayDiv.style.backgroundColor = "white";
     }
+  }
 }
-}
-
-
 /*UPDATE COMPLETED ON CALENDAR*/
 var dayDivs = document.querySelectorAll(".day");
-for (var i = 0; i < currentDate; i++){
+for (var i = 0; i < dayCount; i++){
     dayDivs[i].onclick = function (e) {
+        var isCurrentMonth =
+            currentMonth === date.getMonth() &&
+            currentYear === date.getFullYear();
+
+        if (!isCurrentMonth && currentMonth > date.getMonth()) {
+            return; 
+        }
         var num = e.target.innerText;
         var selectedDate = document.getElementById(e.target.id);
         var storageString = 
@@ -310,6 +242,7 @@ for (var i = 0; i < currentDate; i++){
     }
 }
 
+
 /*RESET BUTTON*/
 
 var resetButton = document.getElementById("resetButton");
@@ -326,6 +259,65 @@ resetButton.onclick = function () {
     totalDays.innerHTML = daysCompleted + "/" + daysInThisMonth;
 };
 
+/*BACK TO THE LAST MONTH*/
+function renderCalendar(month, year) {
+    currentMonth = month;
+    currentYear = year;
+    title.innerHTML = "🌸" + months[currentMonth] + "🌸";
+    daysInThisMonth = daysInTheMonthList[currentMonth];
+    daysCompleted = 0;
+    dayCount = 0;
+    var dayDivs = document.querySelectorAll(".day");
+    dayDivs.forEach(day => {
+        day.innerHTML = "";
+        day.style.backgroundColor = "white";
+        day.style.border = "none";
+        day.style.color = "black";
+    });
+
+
+    for (let i = 0; i < dayDivs.length; i++) {
+        if (dayCount < daysInThisMonth) {
+            let num = dayCount + 1;
+            dayDivs[i].innerHTML = num;
+            dayDivs[i].id = "day" + num;
+
+            let key = (currentMonth + 1) + "-" + num + "-" + currentYear;
+            if (localStorage.getItem(key) === "true") {
+                dayDivs[i].style.backgroundColor = "pink";
+                daysCompleted++;
+            }
+
+            dayCount++;
+        }
+    }
+
+    totalDays.innerHTML = daysCompleted + "/" + daysInThisMonth;
+}
+
+
+var backButton = document.getElementById("backButton");
+backButton.onclick = function () {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+
+    renderCalendar(currentMonth, currentYear);
+};
+
+var nextButton = document.getElementById("nextButton");
+nextButton.onclick = function () {
+    currentMonth++;
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+
+    renderCalendar(currentMonth, currentYear);
+};
 
 </script>
 </html>
