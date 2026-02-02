@@ -89,7 +89,7 @@ for (var i = 0; i < days.length; i++) {
     }
 }
 
-/* INITIALIZED COMPLETED ARRAY*/currentDate
+/* INITIALIZED COMPLETED ARRAY*/
 
 var completed = new Array(31);
 for (var i = 0; i < dayCount; i++) {
@@ -131,13 +131,16 @@ for(var i = 0; i < dayCount; i++) {
 var dayDivs = document.querySelectorAll(".day");
 for (var i = 0; i < dayCount; i++){
     dayDivs[i].onclick = function (e) {
-        var isCurrentMonth =
-            currentMonth === date.getMonth() &&
-            currentYear === date.getFullYear();
+        var today = new Date();
+        today.setHours(0,0,0,0);
 
-        if (!isCurrentMonth && currentMonth > date.getMonth()) {
-            return; 
-        }
+        var clickedDay = parseInt(e.target.innerText);
+        var clickedDate = new Date(currentYear, currentMonth, clickedDay);
+
+      if (clickedDate > today) {
+      return; 
+}
+
         var num = e.target.innerText;
         var selectedDate = document.getElementById(e.target.id);
         var storageString = 
@@ -155,9 +158,9 @@ for (var i = 0; i < dayCount; i++){
 
         totalDays.innerHTML = daysCompleted + "/" + dayCount;
         console.log(daysCompleted, currentDate);
-        if(daysCompleted === currentDate){
-            alert("great progress");
-        }
+        if (daysCompleted === dayCount) {
+        alert("Great progress");
+}
     }
 }
 
