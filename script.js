@@ -1,3 +1,7 @@
+var realDate = new Date();
+var realMonth = realDate.getMonth();
+var realYear = realDate.getFullYear();
+ 
  /*GET THE DATE*/
 var date = new Date();
 console.log(date);
@@ -160,9 +164,11 @@ for (var i = 0; i < dayCount; i++){
         console.log(daysCompleted, currentDate);
         if (daysCompleted === dayCount) {
         alert("Great progress");
-}
+      }
     }
+    
 }
+
 
 
 /*RESET BUTTON*/
@@ -196,13 +202,22 @@ function renderCalendar(month, year) {
         day.style.border = "none";
         day.style.color = "black";
     });
-
-
-    for (let i = 0; i < dayDivs.length; i++) {
+    
+     for (let i = 0; i < dayDivs.length; i++) {
         if (dayCount < daysInThisMonth) {
             let num = dayCount + 1;
             dayDivs[i].innerHTML = num;
             dayDivs[i].id = "day" + num;
+
+            if (
+            currentMonth === realMonth &&
+            currentYear === realYear &&
+            num === realDate.getDate()
+            ) {
+            dayDivs[i].style.color = "rgb(234, 1, 144)";
+            dayDivs[i].style.border = "2px solid black";
+}
+
 
             let key = (currentMonth + 1) + "-" + num + "-" + currentYear;
             if (localStorage.getItem(key) === "true") {
@@ -215,12 +230,57 @@ function renderCalendar(month, year) {
     }
 
     totalDays.innerHTML = daysCompleted + "/" + daysInThisMonth;
+    addClickEvents(daysInThisMonth);
 }
 
+function addClickEvents(daysInMonth) {
+
+    var dayDivs = document.querySelectorAll(".day");
+
+    for (let i = 0; i < daysInMonth; i++) {
+
+        dayDivs[i].onclick = function (e) {
+
+            var today = new Date();
+            today.setHours(0,0,0,0);
+
+            var clickedDay = parseInt(e.target.innerText);
+            var clickedDate = new Date(currentYear, currentMonth, clickedDay);
+
+            if (clickedDate > today) return;
+
+            var storageString =
+                (currentMonth + 1) + "-" + clickedDay + "-" + currentYear;
+
+            if (localStorage.getItem(storageString) === "true") {
+                e.target.style.backgroundColor = "white";
+                localStorage.setItem(storageString, "false");
+                daysCompleted--;
+            } else {
+                e.target.style.backgroundColor = "pink";
+                localStorage.setItem(storageString, "true");
+                daysCompleted++;
+            }
+
+            totalDays.innerHTML = daysCompleted + "/" + daysInMonth;
+        };
+    }
+}
+
+   
 
 var backButton = document.getElementById("backButton");
 backButton.onclick = function () {
+
+let visibleDate = new Date(currentYear, currentMonth);
+let limitDate = new Date(realYear, realMonth - 1);
+
+    if (visibleDate <= limitDate) {
+        return;
+    }
+
     currentMonth--;
+
     if (currentMonth < 0) {
         currentMonth = 11;
         currentYear--;
@@ -229,14 +289,20 @@ backButton.onclick = function () {
     renderCalendar(currentMonth, currentYear);
 };
 
+
 var nextButton = document.getElementById("nextButton");
 nextButton.onclick = function () {
-    currentMonth++;
 
-    if (currentMonth > 11) {
+ if (currentMonth === realMonth && currentYear === realYear) {
+        return;
+}
+
+currentMonth++;
+
+  if (currentMonth > 11) {
         currentMonth = 0;
         currentYear++;
     }
 
-    renderCalendar(currentMonth, currentYear);
+renderCalendar(currentMonth, currentYear);
 };
