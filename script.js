@@ -212,11 +212,11 @@ function renderCalendar(month, year) {
             if (
             currentMonth === realMonth &&
             currentYear === realYear &&
-            num === realDate.getDate()
+            num === today.getDate()
             ) {
             dayDivs[i].style.color = "rgb(234, 1, 144)";
             dayDivs[i].style.border = "2px solid black";
-}
+          }
 
 
             let key = (currentMonth + 1) + "-" + num + "-" + currentYear;
